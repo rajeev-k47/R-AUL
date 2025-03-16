@@ -7,6 +7,9 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient
@@ -42,7 +45,9 @@ object Raul{
                     if(latestTag.isNotEmpty()){
                         val appVersion ="v${getAppVersion(context).first}.${getAppVersion(context).second}"
                         if(latestTag!=appVersion){
-                            showUpdateDialog(context, Url)
+                            CoroutineScope(Dispatchers.Main).launch {
+                                showUpdateDialog(context, Url)
+                            }
                         }
                     }
                 } else {
