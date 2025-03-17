@@ -137,7 +137,7 @@ object Raul{
 
         val apkUri: Uri = FileProvider.getUriForFile(
             context,
-            "${context.packageName}.fileprovider",
+            "${context.packageName}.provider",
             apkFile
         )
         val intent = Intent(Intent.ACTION_VIEW).apply {
