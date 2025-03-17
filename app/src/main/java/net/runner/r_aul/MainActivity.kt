@@ -82,7 +82,7 @@ object Raul{
         })
     }
 
-    private fun DownloadLatest(updateUrl: String,context: Context,latestTag: String,onComplete: (File?) -> Unit){
+    private fun DownloadLatest(updateUrl: String,context: Context,latestTag: String,onProgress: (Int) -> Unit,onComplete: (File?) -> Unit){
         val client = OkHttpClient()
         val request = Request.Builder()
             .url(updateUrl)
@@ -111,10 +111,11 @@ object Raul{
                             } else {
                                 -1
                             }
+                            onProgress(progress)
                         }
-                        CoroutineScope(Dispatchers.Main).launch {
-                            Toast.makeText(context, "Downloading Update", Toast.LENGTH_SHORT).show()
-                        }
+                    }
+                    CoroutineScope(Dispatchers.Main).launch {
+                        Toast.makeText(context, "Downloading Update", Toast.LENGTH_SHORT).show()
                     }
                     onComplete(file)
                 } else {
@@ -161,8 +162,13 @@ object Raul{
             .setTitle("Update Available")
             .setMessage("A new version is available. Please update.")
             .setPositiveButton("Update") { _, _ ->
-                DownloadLatest(updateUrl, context,latestTag) { file ->
+                DownloadLatest(updateUrl, context,latestTag,
+                    onProgress = { progress ->
+                        Log.d("R-AUL","Progress: $progress")
+                    },
+                    ) { file ->
                     file?.let {
+                        Log.d("R-AUL","File: $it")
                         installApk(context, it)
                     }
                 }
