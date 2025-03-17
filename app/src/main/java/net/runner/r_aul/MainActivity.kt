@@ -69,6 +69,8 @@ object Raul{
                         }
 
                         val appVersion ="v${getAppVersion(context).first}.${getAppVersion(context).second}"
+                        Log.d("R-AUL","Latest Tag: $latestTag")
+                        Log.d("R-AUL","App Version: $appVersion")
                         if(latestTag!=appVersion){
                             CoroutineScope(Dispatchers.Main).launch {
                                 showUpdateDialog(context, updateUrl, latestTag)
@@ -96,6 +98,9 @@ object Raul{
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
                     Log.d("R-AUL","Response successful")
+                    CoroutineScope(Dispatchers.Main).launch {
+                        Toast.makeText(context, "Downloading Update", Toast.LENGTH_SHORT).show()
+                    }
                     val contentLength = response.body?.contentLength() ?: -1
                     val file = File(context.cacheDir, "${latestTag}.apk")
                     file.outputStream().use { output ->
@@ -113,9 +118,6 @@ object Raul{
                             }
                             onProgress(progress)
                         }
-                    }
-                    CoroutineScope(Dispatchers.Main).launch {
-                        Toast.makeText(context, "Downloading Update", Toast.LENGTH_SHORT).show()
                     }
                     onComplete(file)
                 } else {
@@ -145,6 +147,9 @@ object Raul{
             setDataAndType(apkUri, "application/vnd.android.package-archive")
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
+        intent.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
 
         context.startActivity(intent)
     }
