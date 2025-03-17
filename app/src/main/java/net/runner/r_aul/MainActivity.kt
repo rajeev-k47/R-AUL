@@ -89,6 +89,9 @@ object Raul{
         val request = Request.Builder()
             .url(updateUrl)
             .build()
+        CoroutineScope(Dispatchers.Main).launch {
+            Toast.makeText(context, "Downloading Update", Toast.LENGTH_SHORT).show()
+        }
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
@@ -98,9 +101,6 @@ object Raul{
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
                     Log.d("R-AUL","Response successful")
-                    CoroutineScope(Dispatchers.Main).launch {
-                        Toast.makeText(context, "Downloading Update", Toast.LENGTH_SHORT).show()
-                    }
                     val contentLength = response.body?.contentLength() ?: -1
                     val file = File(context.cacheDir, "${latestTag}.apk")
                     file.outputStream().use { output ->
