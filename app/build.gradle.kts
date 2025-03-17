@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "net.runner.r_aul"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 30
