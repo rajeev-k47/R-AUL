@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.content.FileProvider
@@ -70,7 +71,7 @@ object Raul{
                         val appVersion ="v${getAppVersion(context).first}.${getAppVersion(context).second}"
                         if(latestTag!=appVersion){
                             CoroutineScope(Dispatchers.Main).launch {
-                                showUpdateDialog(context, updateUrl)
+                                showUpdateDialog(context, updateUrl, latestTag)
                             }
                         }
                     }
@@ -81,7 +82,7 @@ object Raul{
         })
     }
 
-    private fun DownloadLatest(updateUrl: String,context: Context,onComplete: (File?) -> Unit){
+    private fun DownloadLatest(updateUrl: String,context: Context,latestTag: String,onComplete: (File?) -> Unit){
         val client = OkHttpClient()
         val request = Request.Builder()
             .url(updateUrl)
@@ -94,8 +95,9 @@ object Raul{
 
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
+                    Log.d("R-AUL","Response successful")
                     val contentLength = response.body?.contentLength() ?: -1
-                    val file = File(context.cacheDir, "${updateUrl}.apk")
+                    val file = File(context.cacheDir, "${latestTag}.apk")
                     file.outputStream().use { output ->
                         val inputStream = response.body?.byteStream()
                         val buffer = ByteArray(8192)
@@ -109,13 +111,14 @@ object Raul{
                             } else {
                                 -1
                             }
-                            CoroutineScope(Dispatchers.Main).launch {
-                                Toast.makeText(context, "Downloading Update", Toast.LENGTH_SHORT).show()
-                            }
+                        }
+                        CoroutineScope(Dispatchers.Main).launch {
+                            Toast.makeText(context, "Downloading Update", Toast.LENGTH_SHORT).show()
                         }
                     }
                     onComplete(file)
                 } else {
+                    Log.d("R-AUL","Response unsuccessful")
                     onComplete(null)
                 }
             }
@@ -153,12 +156,12 @@ object Raul{
         return Pair(packageInfo.versionName!!, packageInfo.versionCode)
     }
 
-    private fun showUpdateDialog(context: Context, updateUrl: String) {
+    private fun showUpdateDialog(context: Context, updateUrl: String,latestTag:String) {
         AlertDialog.Builder(context)
             .setTitle("Update Available")
             .setMessage("A new version is available. Please update.")
             .setPositiveButton("Update") { _, _ ->
-                DownloadLatest(updateUrl, context) { file ->
+                DownloadLatest(updateUrl, context,latestTag) { file ->
                     file?.let {
                         installApk(context, it)
                     }
