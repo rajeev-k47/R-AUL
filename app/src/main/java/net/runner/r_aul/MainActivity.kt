@@ -32,10 +32,11 @@ object Raul{
     private var repo = ""
     private var updateUrl = ""
 
-    fun init(githubUserName:String,repoName:String){
+    fun init(githubUserName:String,repoName:String,reminder:Int){
         gituname=githubUserName
         repo=repoName
         Url = "https://api.github.com/repos/$githubUserName/$repoName/tags"
+
     }
 
     fun listen(context: Context){
