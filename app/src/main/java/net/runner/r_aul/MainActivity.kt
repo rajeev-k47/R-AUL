@@ -32,14 +32,13 @@ object Raul{
     private var repo = ""
     private var updateUrl = ""
 
-    fun init(githubUserName:String,repoName:String,reminder:Int){
+    fun init(githubUserName:String,repoName:String){
         gituname=githubUserName
         repo=repoName
         Url = "https://api.github.com/repos/$githubUserName/$repoName/tags"
-
     }
 
-    fun listen(context: Context){
+    fun listen(context: Context,reminder:Int){
         val client = OkHttpClient()
         val request = Request.Builder()
             .url(Url)
@@ -56,6 +55,11 @@ object Raul{
                     var latestTag =""
                     if (jsonArray.length() > 0) latestTag=jsonArray.getJSONObject(0).getString("name") else latestTag=""
                     if(latestTag.isNotEmpty()){
+                        if(!ReminderManager.reminderExists(context,latestTag)){
+                            ReminderManager.initReminder(context,reminder,latestTag)
+                        }else{
+                            ReminderManager.removeReminder(context,latestTag)
+                        }
 
                         val client1 = OkHttpClient()
                         val request1 = Request.Builder()
@@ -72,7 +76,7 @@ object Raul{
                         val appVersion ="v${getAppVersion(context).first}.${getAppVersion(context).second}"
                         Log.d("R-AUL","Latest Tag: $latestTag")
                         Log.d("R-AUL","App Version: $appVersion")
-                        if(latestTag!=appVersion){
+                        if(latestTag!=appVersion && ReminderManager.verifyReminder(context,latestTag)){
                             CoroutineScope(Dispatchers.Main).launch {
                                 showUpdateDialog(context, updateUrl, latestTag)
                             }
