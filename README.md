@@ -10,6 +10,7 @@ R-aul is an Android library that monitors the latest releases of a specified Git
 - Notifies users when an update is available
 - Supports automatic APK downloads
 - Provides an easy way to install updates.
+- Provides the functionality to remind the user for a specific number of times for a particular release.
 
 ## Prerequisites
 
@@ -34,7 +35,7 @@ Add this to your module's `build.gradle` file (make sure to follow Prerequisites
 ```gradle
 dependencies {
 	...
-     implementation("com.github.rajeev-k47:R-AUL:v2.0")
+     implementation("com.github.rajeev-k47:R-AUL:v2.3")
 }
 ```
 ## Usage
@@ -46,7 +47,7 @@ dependencies {
 Initialise the object in onCreate method -
 ``` kotlin
 Raul.init("GITHUB-USERNAME","REPOSITORY")
-Raul.listen(context)
+Raul.listen(context,reminder) //``Reminder`` is the number of timeout reminders of a release
 ```
 This will listen for the latest release from the provided repository and notify the user whenever a new release is published.
 
