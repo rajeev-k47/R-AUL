@@ -28,14 +28,9 @@ class ReminderManager {
         }
         fun verifyReminder(context: Context,githubVersion:String): Boolean {
             val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-            val current = sharedPreferences.getString(githubVersion,"")
-            val new = current?.toInt()?.minus(1)
-            if (new != null) {
-                if(new!=0){
-                    return true
-                }else{
-                    return false
-                }
+            val current = sharedPreferences.getString(githubVersion,"")?.toInt()
+            if (current != null) {
+                return current!=0
             }
             return false
         }

@@ -94,9 +94,6 @@ object Raul{
         val request = Request.Builder()
             .url(updateUrl)
             .build()
-        CoroutineScope(Dispatchers.Main).launch {
-            Toast.makeText(context, "Downloading Update", Toast.LENGTH_SHORT).show()
-        }
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
@@ -172,6 +169,9 @@ object Raul{
             .setTitle("Update Available")
             .setMessage("A new version is available. Please update.")
             .setPositiveButton("Update") { _, _ ->
+                CoroutineScope(Dispatchers.Main).launch {
+                    Toast.makeText(context, "Downloading Update", Toast.LENGTH_SHORT).show()
+                }
                 DownloadLatest(updateUrl, context,latestTag,
                     onProgress = { progress ->
                         Log.d("R-AUL","Progress: $progress")
