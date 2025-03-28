@@ -65,22 +65,27 @@ object Raul{
                         val request1 = Request.Builder()
                             .url("https://api.github.com/repos/$gituname/$repo/releases/tags/$latestTag")
                             .build()
-
-                        val respons = client1.newCall(request1).execute()
-                        val jsonObject = JSONObject(respons.body?.string())
-                        val assets = jsonObject.getJSONArray("assets")
-                        if(assets.length()>0){
-                            updateUrl = assets.getJSONObject(assets.length()-1).getString("browser_download_url")
-                        }
-
-                        val appVersion ="v${getAppVersion(context).first}.${getAppVersion(context).second}"
-                        Log.d("R-AUL","Latest Tag: $latestTag")
-                        Log.d("R-AUL","App Version: $appVersion")
-                        if(latestTag!=appVersion && ReminderManager.verifyReminder(context,latestTag)){
-                            CoroutineScope(Dispatchers.Main).launch {
-                                showUpdateDialog(context, updateUrl, latestTag)
+                        try {
+                            val respons = client1.newCall(request1).execute()
+                            val jsonObject = JSONObject(respons.body?.string())
+                            val assets = jsonObject.getJSONArray("assets")
+                            if(assets.length()>0){
+                                updateUrl = assets.getJSONObject(assets.length()-1).getString("browser_download_url")
                             }
+
+                            val appVersion ="v${getAppVersion(context).first}.${getAppVersion(context).second}"
+                            Log.d("R-AUL","Latest Tag: $latestTag")
+                            Log.d("R-AUL","App Version: $appVersion")
+                            if(latestTag!=appVersion && ReminderManager.verifyReminder(context,latestTag)){
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    showUpdateDialog(context, updateUrl, latestTag)
+                                }
+                            }
+
+                        } catch (e: Exception) {
+                            e.printStackTrace()
                         }
+
                     }
                 } else {
 
